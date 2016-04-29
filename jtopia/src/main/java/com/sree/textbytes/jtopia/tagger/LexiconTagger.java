@@ -26,7 +26,7 @@ public class LexiconTagger extends DefaultTagger implements Tagger {
 		logger.debug("Lexicon initialization started");
 		InputStream fileInputStream = null;
 		BufferedReader bufferedReader = null;
-		fileInputStream = getClass().getClassLoader().getResourceAsStream("english-lexicon.txt");
+		fileInputStream = getClass().getClassLoader().getResourceAsStream(lexiconFileName);
 
 
 		DataInputStream dataInputStream = new DataInputStream(fileInputStream);
