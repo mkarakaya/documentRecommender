@@ -17,7 +17,7 @@ public class DocumentTerm {
     private Long documentId;
 
     @ElementCollection
-    private Map<String, ArrayList<Integer>> terms;
+    private Map<String, Double> terms;
 
     public Long getId() {
         return id;
@@ -32,11 +32,11 @@ public class DocumentTerm {
         this.documentId = documentId;
     }
 
-    public Map<String, ArrayList<Integer>> getTerms() {
+    public Map<String, Double> getTerms() {
         return terms;
     }
 
-    public void setTerms(Map<String, ArrayList<Integer>> terms) {
+    public void setTerms(Map<String, Double> terms) {
         this.terms = terms;
     }
 }

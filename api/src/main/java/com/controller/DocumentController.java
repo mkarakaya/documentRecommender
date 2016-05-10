@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -45,9 +45,19 @@ public class DocumentController {
     private DocumentService documentService;
 
     @RequestMapping(value="/similarDocs",method = RequestMethod.POST)
-    public  Map<String, ArrayList<Integer>> getSimilarDocs(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
-        Map<String, ArrayList<Integer>> finalFilteredTerms = documentService.getTerms(multiPartFile);
-        return finalFilteredTerms;
+    public Map<String, Double> getSimilarDocs(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
+        Map<String, Double> finalFilteredTerms = documentService.getTerms(multiPartFile);
+        LinkedHashMap<String, Double> sortedFinalFilteredTerms = finalFilteredTerms.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (x, y) -> {
+                            throw new AssertionError();
+                        },
+                        LinkedHashMap::new
+                ));
+        return sortedFinalFilteredTerms;
 
     }
 

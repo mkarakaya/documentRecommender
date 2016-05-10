@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -38,7 +40,7 @@ public class DocumentService {
     DocumentRepository documentRepository;
 
     public void modelAppend(MultipartFile multiPartFile) throws IOException {
-        Map<String, ArrayList<Integer>> terms = getTerms(multiPartFile);
+        Map<String, Double> terms = getTerms(multiPartFile);
         Document document= new Document();
         document.setFile(multiPartFile.getBytes());
         documentRepository.save(document);
@@ -49,7 +51,7 @@ public class DocumentService {
 
     }
 
-    public Map<String, ArrayList<Integer>> getTerms(MultipartFile multiPartFile) throws IOException {
+    public Map<String, Double> getTerms(MultipartFile multiPartFile) throws IOException {
         PDDocument load = PDDocument.load(multiPartFile.getInputStream());
         PDFTextStripper stripper= new PDFTextStripper();
         String text = stripper.getText(load);
@@ -66,6 +68,28 @@ public class DocumentService {
         TermsExtractor termExtractor = new TermsExtractor();
         TermDocument termDocument = new TermDocument();
         termDocument = termExtractor.extractTerms(text);
-        return termDocument.getFinalFilteredTerms();
+        return normalizeTermVector(termDocument.getFinalFilteredTerms());
+    }
+
+    private Map<String, Double> normalizeTermVector(Map<String, ArrayList<Integer>> filteredTerm) {
+        Iterator filteredTermMapIter = filteredTerm.entrySet().iterator();
+
+        double norm = 0;
+        while(filteredTermMapIter.hasNext()) {
+
+            Map.Entry<String, ArrayList<Integer>> entry = (Map.Entry<String, ArrayList<Integer>>)filteredTermMapIter.next();
+            norm += entry.getValue().get(0) * entry.getValue().get(0);
+
+        }
+        norm = Math.sqrt(norm);
+
+        Map<String, Double> termVectorNorm = new HashMap<String, Double>();
+        filteredTermMapIter = filteredTerm.entrySet().iterator();
+        while(filteredTermMapIter.hasNext()) {
+            Map.Entry<String, ArrayList<Integer>> entry = (Map.Entry<String, ArrayList<Integer>>)filteredTermMapIter.next();
+            termVectorNorm.put(entry.getKey(), (entry.getValue().get(0).doubleValue() / norm));
+        }
+
+        return termVectorNorm;
     }
 }
