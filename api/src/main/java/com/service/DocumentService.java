@@ -2,6 +2,7 @@ package com.service;
 
 import com.model.Document;
 import com.model.DocumentTerm;
+import com.model.SimilarDocumentDto;
 import com.repository.DocumentRepository;
 import com.repository.DocumentTermRepository;
 import com.sree.textbytes.jtopia.Configuration;
@@ -21,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by 212457624 on 5/2/2016.
@@ -32,6 +32,9 @@ import java.util.Map;
 
 @Service
 public class DocumentService {
+
+    @Autowired
+    SimilarityService similarityService;
 
     @Autowired
     DocumentTermRepository documentTermRepository;
@@ -43,6 +46,7 @@ public class DocumentService {
         Map<String, Double> terms = getTerms(multiPartFile);
         Document document= new Document();
         document.setFile(multiPartFile.getBytes());
+        document.setName(multiPartFile.getOriginalFilename());
         documentRepository.save(document);
         DocumentTerm documentTerm= new DocumentTerm();
         documentTerm.setDocumentId(document.getId());
@@ -91,5 +95,20 @@ public class DocumentService {
         }
 
         return termVectorNorm;
+    }
+
+    public List<SimilarDocumentDto> getSimilarDocs(MultipartFile multiPartFile) throws IOException {
+        List<SimilarDocumentDto> similarDocs= new ArrayList();
+        Map<String, Double> terms = getTerms(multiPartFile);
+        Iterable<DocumentTerm> documentTerms= documentTermRepository.findAll();
+        for(DocumentTerm documentTerm: documentTerms){
+            Map<String, Double> similarDocTerms = documentTerm.getTerms();
+            double similarity=similarityService.getSimilarity(terms, similarDocTerms);
+            Document document = documentRepository.findOne(documentTerm.getDocumentId());
+            SimilarDocumentDto similarDocumentDto= new SimilarDocumentDto(document.getId(),document.getName(),similarity);
+            similarDocs.add(similarDocumentDto);
+        }
+        return similarDocs.stream().sorted((object1, object2) -> object1.getSimilarity() > object2.getSimilarity() ? -1 : 1)
+                .collect(Collectors.toList());
     }
 }

@@ -18,6 +18,8 @@ public class Document implements java.io.Serializable{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String name;
+
     private byte[] file;
 
     public Long getId() {
@@ -31,5 +33,13 @@ public class Document implements java.io.Serializable{
 
     public void setFile(byte[] file) {
         this.file = file;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.model.SimilarDocumentDto;
 import com.service.DocumentService;
 import com.sree.textbytes.jtopia.Configuration;
 import com.sree.textbytes.jtopia.TermDocument;
@@ -44,8 +45,8 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-    @RequestMapping(value="/similarDocs",method = RequestMethod.POST)
-    public Map<String, Double> getSimilarDocs(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
+    @RequestMapping(value="/terms",method = RequestMethod.POST)
+    public Map<String, Double> getTerms(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
         Map<String, Double> finalFilteredTerms = documentService.getTerms(multiPartFile);
         LinkedHashMap<String, Double> sortedFinalFilteredTerms = finalFilteredTerms.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
@@ -60,7 +61,10 @@ public class DocumentController {
         return sortedFinalFilteredTerms;
 
     }
-
+    @RequestMapping(value="/similarDocs",method = RequestMethod.POST)
+    public List<SimilarDocumentDto> getSimilarDocs(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
+        return documentService.getSimilarDocs(multiPartFile);
+    }
     @RequestMapping(value="/modelAppend",method = RequestMethod.POST)
     public void modelAppend(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException {
         documentService.modelAppend(multiPartFile);
