@@ -23,7 +23,7 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/terms",method = RequestMethod.POST)
     public Map<String, Double> getTerms(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
         Map<String, Double> finalFilteredTerms = documentService.getTerms(multiPartFile);
@@ -40,31 +40,31 @@ public class DocumentController {
         return sortedFinalFilteredTerms;
 
     }
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/similarDocs",method = RequestMethod.POST)
-    public List<DocumentDto> getSimilarDocs(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException, ParseException {
+    public List<DocumentDto> getSimilarDocs(@RequestParam("file") MultipartFile multiPartFile) throws IOException, ParseException {
         return documentService.getSimilarDocs(multiPartFile);
     }
 
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/docs",method = RequestMethod.GET)
     public List<DocumentDto> getDocs() throws IOException, ParseException {
         return documentService.getDocs();
     }
 
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/{id}",method = RequestMethod.GET)
     public OutputStream getDocFile(@PathVariable Long id) throws IOException, ParseException {
         return documentService.getDocFile(id);
     }
 
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/modelAppend",method = RequestMethod.POST)
     public void modelAppend(@RequestParam(required = true) MultipartFile multiPartFile) throws IOException {
         documentService.modelAppend(multiPartFile);
     }
 
-    @CrossOrigin(origins = "http://localhost:5001")
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping(value="/healthCheck",method = RequestMethod.GET)
     public String healthCheck() {
         return "don't worry be happy";
