@@ -37,4 +37,5 @@ public class SimilarDocumentDto {
     public void setSimilarity(double similarity) {
         this.similarity = similarity;
     }
+
 }

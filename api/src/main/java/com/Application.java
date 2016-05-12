@@ -51,7 +51,7 @@ public class Application {
                 addUser("admin", "admin");
                 addUser("user", "user");
 
-                generateExpenses();
+                //generateExpenses();
             }
 
             private void generateExpenses() {

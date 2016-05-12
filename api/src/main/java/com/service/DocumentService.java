@@ -103,8 +103,8 @@ public class DocumentService {
         Iterable<DocumentTerm> documentTerms= documentTermRepository.findAll();
         for(DocumentTerm documentTerm: documentTerms){
             Map<String, Double> similarDocTerms = documentTerm.getTerms();
-            double similarity=similarityService.getSimilarity(terms, similarDocTerms);
             Document document = documentRepository.findOne(documentTerm.getDocumentId());
+            double similarity=similarityService.getSimilarity(terms, similarDocTerms);
             SimilarDocumentDto similarDocumentDto= new SimilarDocumentDto(document.getId(),document.getName(),similarity);
             similarDocs.add(similarDocumentDto);
         }
