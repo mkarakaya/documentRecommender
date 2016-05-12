@@ -2,7 +2,7 @@ package com.service;
 
 import com.model.Document;
 import com.model.DocumentTerm;
-import com.model.SimilarDocumentDto;
+import com.model.DocumentDto;
 import com.repository.DocumentRepository;
 import com.repository.DocumentTermRepository;
 import com.sree.textbytes.jtopia.Configuration;
@@ -10,21 +10,15 @@ import com.sree.textbytes.jtopia.TermDocument;
 import com.sree.textbytes.jtopia.TermsExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
-import org.hibernate.Hibernate;
-import org.hibernate.LobHelper;
-import org.hibernate.engine.jdbc.LobCreator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by 212457624 on 5/2/2016.
@@ -97,18 +91,36 @@ public class DocumentService {
         return termVectorNorm;
     }
 
-    public List<SimilarDocumentDto> getSimilarDocs(MultipartFile multiPartFile) throws IOException {
-        List<SimilarDocumentDto> similarDocs= new ArrayList();
+    public List<DocumentDto> getSimilarDocs(MultipartFile multiPartFile) throws IOException {
+        List<DocumentDto> similarDocs= new ArrayList();
         Map<String, Double> terms = getTerms(multiPartFile);
         Iterable<DocumentTerm> documentTerms= documentTermRepository.findAll();
         for(DocumentTerm documentTerm: documentTerms){
             Map<String, Double> similarDocTerms = documentTerm.getTerms();
             Document document = documentRepository.findOne(documentTerm.getDocumentId());
             double similarity=similarityService.getSimilarity(terms, similarDocTerms);
-            SimilarDocumentDto similarDocumentDto= new SimilarDocumentDto(document.getId(),document.getName(),similarity);
-            similarDocs.add(similarDocumentDto);
+            DocumentDto documentDto = new DocumentDto(document.getId(),document.getName(),similarity);
+            similarDocs.add(documentDto);
         }
         return similarDocs.stream().sorted((object1, object2) -> object1.getSimilarity() > object2.getSimilarity() ? -1 : 1)
                 .collect(Collectors.toList());
+    }
+
+    public List<DocumentDto> getDocs() {
+        List<DocumentDto> docs= new ArrayList<>();
+        Iterable<Document> all = documentRepository.findAll();
+        for (Document document : all) {
+            docs.add(new DocumentDto(document.getId(),document.getName(),0));
+        }
+        return docs;
+    }
+
+    public OutputStream getDocFile(Long id) throws IOException {
+        Document document = documentRepository.findOne(id);
+        byte[] file = document.getFile();
+        OutputStream out = new FileOutputStream(document.getName());
+        out.write(file);
+        out.close();
+        return out;
     }
 }

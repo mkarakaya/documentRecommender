@@ -3,16 +3,19 @@ package com.model;
 /**
  * Created by p.bell on 10.05.2016.
  */
-public class SimilarDocumentDto {
+public class DocumentDto {
 
     private long id;
     private String name;
     private double similarity;
+    private String author;
+    private String format;
 
-    public SimilarDocumentDto(long id, String name, double similarity){
+    public DocumentDto(long id, String name, double similarity){
         this.id=id;
         this.name=name;
         this.similarity=similarity;
+        this.format="PDF";
     }
     public long getId() {
         return id;
@@ -38,4 +41,19 @@ public class SimilarDocumentDto {
         this.similarity = similarity;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
 }
